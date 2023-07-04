@@ -7,7 +7,8 @@
 package protocol
 
 import (
-	"io/ioutil"
+	"context"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -52,7 +53,7 @@ func TestReverseProxy(t *testing.T) {
 		w.Header().Add("X-Multi-Value", "bar")
 		http.SetCookie(w, &http.Cookie{Name: "flavor", Value: "chocolateChip"})
 		w.WriteHeader(backendStatus)
-		w.Write([]byte(backendResponse))
+		_, _ = w.Write([]byte(backendResponse))
 		w.Header().Set("X-Trailer", "trailer_value")
 	}))
 	defer backend.Close()
@@ -94,7 +95,7 @@ func TestReverseProxy(t *testing.T) {
 	if cookie := res.Cookies()[0]; cookie.Name != "flavor" {
 		t.Errorf("unexpected cookie %q", cookie.Name)
 	}
-	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	bodyBytes, _ := io.ReadAll(res.Body)
 	if g, e := string(bodyBytes), backendResponse; g != e {
 		t.Errorf("got body %q; expected %q", g, e)
 	}
@@ -116,7 +117,7 @@ func TestXForwardedFor(t *testing.T) {
 			t.Errorf("X-Forwarded-For didn't contain prior data")
 		}
 		w.WriteHeader(backendStatus)
-		w.Write([]byte(backendResponse))
+		_, _ = w.Write([]byte(backendResponse))
 	}))
 	defer backend.Close()
 	backendURL, err := url.Parse(backend.URL)
@@ -139,7 +140,7 @@ func TestXForwardedFor(t *testing.T) {
 	if g, e := res.StatusCode, backendStatus; g != e {
 		t.Errorf("got res.StatusCode %d; expected %d", g, e)
 	}
-	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	bodyBytes, _ := io.ReadAll(res.Body)
 	if g, e := string(bodyBytes), backendResponse; g != e {
 		t.Errorf("got body %q; expected %q", g, e)
 	}
@@ -159,7 +160,7 @@ var proxyQueryTests = []struct {
 func TestReverseProxyQuery(t *testing.T) {
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Got-Query", r.URL.RawQuery)
-		w.Write([]byte("hi"))
+		_, _ = w.Write([]byte("hi"))
 	}))
 	defer backend.Close()
 
@@ -178,7 +179,7 @@ func TestReverseProxyQuery(t *testing.T) {
 		if g, e := res.Header.Get("X-Got-Query"), tt.want; g != e {
 			t.Errorf("%d. got query %q; expected %q", i, g, e)
 		}
-		res.Body.Close()
+		_ = res.Body.Close()
 		frontend.Close()
 	}
 }
@@ -186,7 +187,7 @@ func TestReverseProxyQuery(t *testing.T) {
 func TestReverseProxyFlushInterval(t *testing.T) {
 	const expected = "hi"
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(expected))
+		_, _ = w.Write([]byte(expected))
 	}))
 	defer backend.Close()
 
@@ -212,7 +213,7 @@ func TestReverseProxyFlushInterval(t *testing.T) {
 		t.Fatalf("Get: %v", err)
 	}
 	defer res.Body.Close()
-	if bodyBytes, _ := ioutil.ReadAll(res.Body); string(bodyBytes) != expected {
+	if bodyBytes, _ := io.ReadAll(res.Body); string(bodyBytes) != expected {
 		t.Errorf("got body %q; expected %q", bodyBytes, expected)
 	}
 
@@ -230,9 +231,9 @@ func TestReverseProxyCancellation(t *testing.T) {
 	}
 	const backendResponse = "I am the backend"
 
-	reqInFlight := make(chan struct{})
+	reqInFlight, reqInFlightCancel := context.WithCancel(context.Background())
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		close(reqInFlight)
+		reqInFlightCancel()
 
 		select {
 		case <-time.After(10 * time.Second):
@@ -240,16 +241,16 @@ func TestReverseProxyCancellation(t *testing.T) {
 			// closenotify case should be instantaneous.
 			t.Log("Failed to close backend connection")
 			t.Fail()
-		case <-w.(http.CloseNotifier).CloseNotify():
+		case <-r.Context().Done():
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(backendResponse))
+		_, _ = w.Write([]byte(backendResponse))
 	}))
 
 	defer backend.Close()
 
-	backend.Config.ErrorLog = log.New(ioutil.Discard, "", 0)
+	backend.Config.ErrorLog = log.New(io.Discard, "", 0)
 
 	backendURL, err := url.Parse(backend.URL)
 	if err != nil {
@@ -261,11 +262,7 @@ func TestReverseProxyCancellation(t *testing.T) {
 	frontend := httptest.NewServer(proxyHandler)
 	defer frontend.Close()
 
-	getReq, _ := http.NewRequest("GET", frontend.URL, nil)
-	go func() {
-		<-reqInFlight
-		http.DefaultTransport.(*http.Transport).CancelRequest(getReq)
-	}()
+	getReq, _ := http.NewRequestWithContext(reqInFlight, "GET", frontend.URL, nil)
 	res, err := http.DefaultClient.Do(getReq)
 	if res != nil {
 		t.Fatal("Non-nil response")

@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -23,7 +22,7 @@ func main() {
 	http.HandleFunc("/hello", helloServer)
 	http.HandleFunc("/", fileNotFoundServer)
 
-	caCert, err := ioutil.ReadFile("ca.pem")
+	caCert, err := os.ReadFile("ca.pem")
 	if err != nil {
 		log.Fatal(err)
 	}

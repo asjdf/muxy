@@ -2,12 +2,11 @@ package symptom
 
 import (
 	"bytes"
+	"io"
 	"net/http"
 	"net/url"
 	"testing"
 	"time"
-
-	"io/ioutil"
 
 	"github.com/mefellows/muxy/muxy"
 )
@@ -71,7 +70,7 @@ func TestHTTPTampererSymptom_MuckRequest(t *testing.T) {
 	if ctx.Request.Host != "mynewhost.com" {
 		t.Fatal("Expected request to be tampered to host mynewhost.com, got", ctx.Request.Host)
 	}
-	body, _ := ioutil.ReadAll(ctx.Request.Body)
+	body, _ := io.ReadAll(ctx.Request.Body)
 	if string(body) != "my new body" {
 		t.Fatal("Expected request body to be tampered to 'my new body', got", string(body))
 	}
@@ -84,7 +83,7 @@ func TestHTTPTampererSymptom_MuckRequest(t *testing.T) {
 }
 
 func TestHTTPTampererSymptom_MuckResponse(t *testing.T) {
-	cl := ioutil.NopCloser(bytes.NewReader([]byte("my new response body")))
+	cl := io.NopCloser(bytes.NewReader([]byte("my new response body")))
 	tamperer := HTTPTampererSymptom{
 		Response: ResponseConfig{
 			Body: "my new body",
@@ -116,7 +115,7 @@ func TestHTTPTampererSymptom_MuckResponse(t *testing.T) {
 
 	tamperer.MuckResponse(ctx)
 
-	body, _ := ioutil.ReadAll(ctx.Response.Body)
+	body, _ := io.ReadAll(ctx.Response.Body)
 	if string(body) != "my new body" {
 		t.Fatal("Expected response body to be tampered to 'my new body', got", string(body))
 	}
@@ -139,7 +138,7 @@ func TestHTTPTampererSymptom_MuckResponse(t *testing.T) {
 }
 
 func TestHTTPTampererSymptom_HandleEventPostDispatch(t *testing.T) {
-	cl := ioutil.NopCloser(bytes.NewReader([]byte("my response body")))
+	cl := io.NopCloser(bytes.NewReader([]byte("my response body")))
 	tamperer := HTTPTampererSymptom{
 		Response: ResponseConfig{
 			Body: "my new body",
@@ -169,7 +168,7 @@ func TestHTTPTampererSymptom_HandleEventPostDispatch(t *testing.T) {
 	tamperer.Setup()
 	tamperer.HandleEvent(muxy.EventPostDispatch, ctx)
 
-	body, _ := ioutil.ReadAll(ctx.Response.Body)
+	body, _ := io.ReadAll(ctx.Response.Body)
 	if string(body) != "my new body" {
 		t.Fatal("Expected response body to be tampered to 'my new body', got", string(body))
 	}
@@ -224,7 +223,7 @@ func TestHTTPTampererSymptom_HandleEventPreDispatch(t *testing.T) {
 	if ctx.Request.Host != "mynewhost.com" {
 		t.Fatal("Expected request to be tampered to host mynewhost.com, got", ctx.Request.Host)
 	}
-	body, _ := ioutil.ReadAll(ctx.Request.Body)
+	body, _ := io.ReadAll(ctx.Request.Body)
 	if string(body) != "my new body" {
 		t.Fatal("Expected request body to be tampered to 'my new body', got", string(body))
 	}

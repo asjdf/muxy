@@ -34,9 +34,9 @@ func setupLocalTCP(port int) {
 			// multiple connections may be served concurrently.
 			go func(c net.Conn) {
 				// Echo all incoming data.
-				io.Copy(c, c)
+				_, _ = io.Copy(c, c)
 				// Shut down the connection.
-				c.Close()
+				_ = c.Close()
 			}(conn)
 		}
 	}()
@@ -95,7 +95,7 @@ func TestTCPProxy_Proxy(t *testing.T) {
 		t.Fatal("Got", i, "want", len(message))
 	}
 
-	conn.CloseRead()
+	_ = conn.CloseRead()
 }
 func TestTCPProxy_ProxyWithMiddleware(t *testing.T) {
 	proxyPort := 7779
@@ -159,7 +159,7 @@ func TestTCPProxy_ProxyWithMiddleware(t *testing.T) {
 		t.Fatal("Got", i, "want", len(message))
 	}
 
-	conn.CloseRead()
+	_ = conn.CloseRead()
 }
 
 func TestTCPProxy_ProxyFail(t *testing.T) {

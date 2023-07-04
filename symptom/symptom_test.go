@@ -13,21 +13,21 @@ type MockSymptom struct {
 	SetupCount     int
 }
 
-func (m MockSymptom) Setup() {
+func (m *MockSymptom) Setup() {
 	log.Println("Mock Setup()")
 	m.SetupCount = m.SetupCount + 1
 }
 
-func (m MockSymptom) HandleEvent(e muxy.ProxyEvent, ctx *muxy.Context) {
+func (m *MockSymptom) HandleEvent(e muxy.ProxyEvent, ctx *muxy.Context) {
 	log.Println("Mock HandleEvent()")
 }
 
-func (m MockSymptom) Muck() {
+func (m *MockSymptom) Muck() {
 	log.Println("Mock Muck()")
 	m.MuckCount = m.MuckCount + 1
 }
 
-func (m MockSymptom) Teardown() {
+func (m *MockSymptom) Teardown() {
 	log.Println("Mock Teardown()")
 	m.TeardownCount = m.TeardownCount + 1
 }

@@ -72,11 +72,5 @@ func (m *HTTPDelaySymptom) HandleEvent(e muxy.ProxyEvent, ctx *muxy.Context) {
 func (m *HTTPDelaySymptom) Muck(ctx *muxy.Context, wait int) {
 	delay := time.Duration(wait) * time.Millisecond
 	log.Debug("Delay Symptom - Muck(), delaying for %v seconds", delay.Seconds())
-
-	for {
-		select {
-		case <-time.After(delay):
-			return
-		}
-	}
+	time.Sleep(delay)
 }

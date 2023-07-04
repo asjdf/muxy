@@ -2,7 +2,7 @@ package run
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -52,7 +52,7 @@ func TestTCPProxy_Run(t *testing.T) {
 	}
 
 	// Check body
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	res.Body.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -71,10 +71,12 @@ func runTestServer(port int) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		w.Write([]byte(proxiedServerBody))
+		_, _ = w.Write([]byte(proxiedServerBody))
 	})
 
-	go http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
+	go func() {
+		_ = http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
+	}()
 }
 
 func waitForPort(port int, t *testing.T) {

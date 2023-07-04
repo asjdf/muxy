@@ -16,7 +16,7 @@ func TestPfctlDefaultConfigCommand(t *testing.T) {
 	c.TargetPorts = []string{}
 	c.TargetProtos = []string{"tcp,udp,icmp"}
 
-	th.setup(&c)
+	_ = th.setup(&c)
 	r.verifyCommands(t, []string{
 		"sudo pfctl -E",
 		`(cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -`,
@@ -38,7 +38,7 @@ func TestPfctlThrottleOnlyConfigCommand(t *testing.T) {
 	r := newCmdRecorder()
 	th := &pfctlThrottler{r}
 
-	th.setup(&c)
+	_ = th.setup(&c)
 	r.verifyCommands(t, []string{
 		"sudo pfctl -E",
 		`(cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -`,
@@ -60,7 +60,7 @@ func TestPfctlNoIPThrottleConfigCommand(t *testing.T) {
 	r := newCmdRecorder()
 	th := &pfctlThrottler{r}
 
-	th.setup(&c)
+	_ = th.setup(&c)
 	r.verifyCommands(t, []string{
 		"sudo pfctl -E",
 		`(cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -`,
@@ -76,7 +76,7 @@ func TestPfctlPacketSetup(t *testing.T) {
 	c := defaultTestConfig
 	c.PacketLoss = 0.5
 
-	th.setup(&c)
+	_ = th.setup(&c)
 	r.verifyCommands(t, []string{
 		"sudo pfctl -E",
 		`(cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -`,
@@ -96,7 +96,7 @@ func TestPfctlProtoSetup(t *testing.T) {
 	c.PacketLoss = 0.5
 	c.TargetProtos = []string{"tcp", "udp", "icmp"}
 
-	th.setup(&c)
+	_ = th.setup(&c)
 	r.verifyCommands(t, []string{
 		"sudo pfctl -E",
 		`(cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -`,
@@ -123,7 +123,7 @@ func TestPfctlMultiplePortsAndIps(t *testing.T) {
 	cfg.TargetIps = []string{"1.1.1.1", "2.2.2.2"}
 	cfg.TargetPorts = []string{"80", "8080"}
 	cfg.TargetProtos = []string{"tcp"}
-	th.setup(&cfg)
+	_ = th.setup(&cfg)
 	r.verifyCommands(t, []string{
 		"sudo pfctl -E",
 		`(cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -`,
@@ -154,7 +154,7 @@ func TestPfctlMixedIPv6Setup(t *testing.T) {
 	cfg.TargetProtos = []string{"icmp", "tcp"}
 	cfg.PacketLoss = 0.2
 	cfg.TargetIps6 = []string{"2001:db8::1"}
-	th.setup(&cfg)
+	_ = th.setup(&cfg)
 	r.verifyCommands(t, []string{
 		`sudo pfctl -E`,
 		`(cat /etc/pf.conf && echo "dummynet-anchor \"mop\"" && echo "anchor \"mop\"") | sudo pfctl -f -`,

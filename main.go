@@ -2,16 +2,13 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
-	"os"
-	"strings"
-	"time"
-
 	"github.com/mefellows/muxy/command"
 	_ "github.com/mefellows/muxy/middleware"
 	_ "github.com/mefellows/muxy/protocol"
 	_ "github.com/mefellows/muxy/symptom"
 	"github.com/mitchellh/cli"
+	"os"
+	"strings"
 )
 
 func main() {
@@ -19,7 +16,6 @@ func main() {
 }
 
 func realMain() int {
-	rand.Seed(time.Now().Unix())
 	cli := cli.NewCLI(strings.ToLower(ApplicationName), Version)
 	cli.Args = os.Args[1:]
 	cli.Commands = command.Commands

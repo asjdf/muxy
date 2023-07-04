@@ -4,6 +4,7 @@ package run
 import (
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/mefellows/muxy/log"
 	"github.com/mefellows/muxy/muxy"
@@ -55,7 +56,7 @@ func (m *Muxy) Run() {
 
 	// Interrupt handler
 	m.sigChan = make(chan os.Signal, 1)
-	signal.Notify(m.sigChan, os.Interrupt, os.Kill)
+	signal.Notify(m.sigChan, os.Interrupt, syscall.SIGTERM)
 
 	// Start proxy
 	for _, proxy := range m.proxies {

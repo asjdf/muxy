@@ -13,11 +13,11 @@ func TestCommands_Init(t *testing.T) {
 	if proxy == nil {
 		t.Fatal("Want proxy command, got nil")
 	}
-	proxy()
+	_, _ = proxy()
 
 	pki := Commands["pki"]
 	if Commands["pki"] == nil {
 		t.Fatal("Want pki command, got nil")
 	}
-	pki()
+	_, _ = pki()
 }

@@ -7,6 +7,10 @@ Proxy for simulating real-world distributed system failures to improve resilienc
 [![GoDoc](https://godoc.org/github.com/mefellows/muxy?status.svg)](https://godoc.org/github.com/mefellows/muxy)
 [![Coverage Status](https://coveralls.io/repos/github/mefellows/muxy/badge.svg?branch=HEAD)](https://coveralls.io/github/mefellows/muxy?branch=HEAD)
 
+## What's different?
+
+This branch use new tech to build the project.
+
 ## Introduction
 
 Muxy is a proxy that _mucks_ with your system and application context, operating at Layers 4, 5 and 7, allowing you to simulate common failure scenarios from the perspective of an application under test; such as an API or a web application.

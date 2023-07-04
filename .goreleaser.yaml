@@ -1,0 +1,110 @@
+# From: https://github.com/asjdf/semantic-release-go-demo
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of uname.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+    - goos: windows
+      format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+release:
+  prerelease: auto
+universal_binaries:
+  - replace: true
+brews:
+  -
+    name: "muxy"
+
+    # Allows you to set a custom download strategy. Note that you'll need
+    # to implement the strategy and add it to your tap repository.
+    # Example: https://docs.brew.sh/Formula-Cookbook#specifying-the-download-strategy-explicitly
+    download_strategy: CurlDownloadStrategy
+
+    # Git author used to commit to the repository.
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+
+    # The project name and current git tag are used in the format string.
+    #
+    # Templates: allowed
+    commit_msg_template: "chore: brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+
+    # Folder inside the repository to put the formula.
+    folder: Formula
+
+    # Caveats for the user of your binary.
+    caveats: "Check https://github.com/asjdf/muxy"
+
+    # Your app's homepage.
+    homepage: "https://github.com/asjdf/muxy"
+
+    # Your app's description.
+    #
+    # Templates: allowed
+    description: "Proxy for simulating real-world distributed system failures to improve resilience in your applications."
+
+    # SPDX identifier of your app's license.
+    license: "MIT"
+
+    # Setting this will prevent goreleaser to actually try to commit the updated
+    # formula - instead, the formula file will be stored on the dist folder only,
+    # leaving the responsibility of publishing it to the user.
+    # If set to auto, the release will not be uploaded to the homebrew tap
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    #
+    # Templates: allowed
+    skip_upload: auto
+
+    # Repository to push the generated files to.
+    repository:
+      # Repository owner.
+      #
+      # Templates: allowed
+      owner: asjdf
+
+      # Repository name.
+      #
+      # Templates: allowed
+      name: muxy
+
+      # Sets up pull request creation instead of just pushing to the given branch.
+      # Make sure the 'branch' property is different from base before enabling
+      # it.
+      #
+      # Since: v1.17
+      pull_request:
+        # Whether to enable it or not.
+        enabled: true

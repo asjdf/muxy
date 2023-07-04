@@ -2,14 +2,12 @@ package symptom
 
 import (
 	"fmt"
+	"github.com/mefellows/muxy/muxy"
 	"math"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"testing"
-	"time"
-
-	"github.com/mefellows/muxy/muxy"
 )
 
 func TestMatchSymptom_Hit(t *testing.T) {
@@ -106,7 +104,6 @@ func TestMatchSymptom_Miss(t *testing.T) {
 }
 
 func TestProbability(t *testing.T) {
-	rand.Seed(time.Now().Unix())
 	likelihood := rand.Intn(100)
 	fmt.Println(likelihood)
 	fmt.Println(int(math.Min(65, 100)))

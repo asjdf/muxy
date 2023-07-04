@@ -5,7 +5,7 @@ package symptom
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"strings"
@@ -144,7 +144,7 @@ func (m *HTTPTampererSymptom) MuckResponse(ctx *muxy.Context) {
 	if ctx.Response != nil {
 		// Body
 		if m.Response.Body != "" {
-			cl := ioutil.NopCloser(bytes.NewReader([]byte(m.Response.Body)))
+			cl := io.NopCloser(bytes.NewReader([]byte(m.Response.Body)))
 			r := &http.Response{
 				Request:          ctx.Request,
 				Header:           ctx.Response.Header,

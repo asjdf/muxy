@@ -129,31 +129,27 @@ func (p *ReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	outreq := new(http.Request)
 	*outreq = *req // includes shallow copies of maps, but okay
 
-	if closeNotifier, ok := rw.(http.CloseNotifier); ok {
-		if requestCanceler, ok := transport.(requestCanceler); ok {
-			reqDone := make(chan struct{})
-			defer close(reqDone)
+	if requestCanceler, ok := transport.(requestCanceler); ok {
+		reqDone := make(chan struct{})
+		defer close(reqDone)
 
-			clientGone := closeNotifier.CloseNotify()
-
-			outreq.Body = struct {
-				io.Reader
-				io.Closer
-			}{
-				Reader: &runOnFirstRead{
-					Reader: outreq.Body,
-					fn: func() {
-						go func() {
-							select {
-							case <-clientGone:
-								requestCanceler.CancelRequest(outreq)
-							case <-reqDone:
-							}
-						}()
-					},
+		outreq.Body = struct {
+			io.Reader
+			io.Closer
+		}{
+			Reader: &runOnFirstRead{
+				Reader: outreq.Body,
+				fn: func() {
+					go func() {
+						select {
+						case <-req.Context().Done():
+							requestCanceler.CancelRequest(outreq)
+						case <-reqDone:
+						}
+					}()
 				},
-				Closer: outreq.Body,
-			}
+			},
+			Closer: outreq.Body,
 		}
 	}
 
@@ -238,7 +234,7 @@ func (p *ReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	p.copyResponse(rw, res.Body)
-	res.Body.Close() // close now, instead of defer, to populate res.Trailer
+	_ = res.Body.Close() // close now, instead of defer, to populate res.Trailer
 	copyHeader(rw.Header(), res.Trailer)
 }
 
@@ -256,7 +252,7 @@ func (p *ReverseProxy) copyResponse(dst io.Writer, src io.Reader) {
 		}
 	}
 
-	io.Copy(dst, src)
+	_, _ = io.Copy(dst, src)
 }
 
 type writeFlusher interface {

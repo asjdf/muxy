@@ -20,7 +20,7 @@ func (r *cmdRecorder) execute(cmd string) error {
 }
 
 func (r *cmdRecorder) executeGetLines(cmd string) ([]string, error) {
-	r.execute(cmd)
+	_ = r.execute(cmd)
 	if responses, found := r.responses[cmd]; found {
 		return responses, nil
 	}
@@ -74,7 +74,7 @@ func TestTcPacketLossSetup(t *testing.T) {
 	cfg := defaultTestConfig
 	cfg.Device = "eth1"
 	cfg.PacketLoss = 0.2
-	th.setup(&cfg)
+	_ = th.setup(&cfg)
 	r.verifyCommands(t, []string{
 		"sudo tc qdisc add dev eth1 handle 10: root htb default 1",
 		"sudo tc class add dev eth1 parent 10: classid 10:1 htb rate 20000kbit",
@@ -89,10 +89,10 @@ func TestTcWildcardIps(t *testing.T) {
 	th := &tcThrottler{r}
 	cfg := defaultTestConfig
 	cfg.TargetIps = []string{}
-	cfg.TargetPorts  = []string{}
-	cfg.TargetProtos  = []string{}
+	cfg.TargetPorts = []string{}
+	cfg.TargetProtos = []string{}
 	cfg.PacketLoss = -1
-	th.setup(&cfg)
+	_ = th.setup(&cfg)
 	r.verifyCommands(t, []string{
 		"sudo tc qdisc add dev eth0 handle 10: root htb default 1",
 		"sudo tc class add dev eth0 parent 10: classid 10:1 htb rate 20000kbit",
@@ -110,7 +110,7 @@ func TestTcMultiplePortsAndIps(t *testing.T) {
 	cfg.TargetIps = []string{"1.1.1.1", "2.2.2.2"}
 	cfg.TargetPorts = []string{"80", "8080"}
 	cfg.TargetProtos = []string{"tcp", "udp"}
-	th.setup(&cfg)
+	_ = th.setup(&cfg)
 	r.verifyCommands(t, []string{
 		"sudo tc qdisc add dev eth0 handle 10: root htb default 1",
 		"sudo tc class add dev eth0 parent 10: classid 10:1 htb rate 20000kbit",
@@ -130,7 +130,7 @@ func TestTcMixedIPv6Setup(t *testing.T) {
 	cfg.Device = "eth1"
 	cfg.PacketLoss = 0.2
 	cfg.TargetIps6 = []string{"2001:db8::1"}
-	th.setup(&cfg)
+	_ = th.setup(&cfg)
 	r.verifyCommands(t, []string{
 		"sudo tc qdisc add dev eth1 handle 10: root htb default 1",
 		"sudo tc class add dev eth1 parent 10: classid 10:1 htb rate 20000kbit",
@@ -161,7 +161,7 @@ func TestTcTeardown(t *testing.T) {
 			"-P POSTROUTING ACCEPT",
 		},
 	}
-	th.teardown(&defaultTestConfig)
+	_ = th.teardown(&defaultTestConfig)
 	r.verifyCommands(t, []string{
 		"sudo iptables -S -t mangle",
 		"sudo iptables -t mangle -D POSTROUTING -d 10.10.10.10 -p tcp -m tcp --dport 80 -j CLASSIFY --set-class 0010:0010",
@@ -173,7 +173,7 @@ func TestTcTeardown(t *testing.T) {
 func TestTcTeardownNoIpTables(t *testing.T) {
 	r := newCmdRecorder()
 	th := &tcThrottler{r}
-	th.teardown(&defaultTestConfig)
+	_ = th.teardown(&defaultTestConfig)
 	r.verifyCommands(t, []string{
 		"sudo iptables -S -t mangle",
 		"sudo ip6tables -S -t mangle",
@@ -197,7 +197,7 @@ func TestTcIPv6Teardown(t *testing.T) {
 	}
 	config := defaultTestConfig
 
-	th.teardown(&config)
+	_ = th.teardown(&config)
 	r.verifyCommands(t, []string{
 		"sudo iptables -S -t mangle",
 		"sudo ip6tables -S -t mangle",
@@ -221,7 +221,7 @@ func TestTcTeardownNoIPv6(t *testing.T) {
 		},
 	}
 
-	th.teardown(&defaultTestConfig)
+	_ = th.teardown(&defaultTestConfig)
 	r.verifyCommands(t, []string{
 		"sudo iptables -S -t mangle",
 		"sudo iptables -t mangle -D POSTROUTING -d 10.10.10.10 -p tcp -m tcp --dport 80 -j CLASSIFY --set-class 0010:0010",

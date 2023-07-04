@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"testing"
@@ -54,7 +54,7 @@ func TestLogger_HandleEventPreDispatchWithHTTP(t *testing.T) {
 func TestLogger_HandleEventPostDispatchWithHTTP(t *testing.T) {
 	l := LoggerMiddleware{}
 
-	cl := ioutil.NopCloser(bytes.NewReader([]byte("my new response body")))
+	cl := io.NopCloser(bytes.NewReader([]byte("my new response body")))
 
 	ctx := &muxy.Context{
 		Request: &http.Request{
@@ -70,7 +70,7 @@ func TestLogger_HandleEventPostDispatchWithHTTP(t *testing.T) {
 			Status:     "301",
 			StatusCode: 301,
 			Header: map[string][]string{
-				"MyOriginalHeader": []string{"MyOriginalHeader"},
+				"MyOriginalHeader": {"MyOriginalHeader"},
 			},
 		},
 	}

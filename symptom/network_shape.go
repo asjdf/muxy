@@ -28,8 +28,6 @@ type NetworkShaperSymptom struct {
 	TargetIps6       []string `mapstructure:"target_ips6"`
 	TargetPorts      []string `mapstructure:"target_ports"`
 	TargetProtos     []string `mapstructure:"target_protos" required:"true" default:"tcp,icmp,udp"`
-	out              io.Writer
-	err              io.Writer
 }
 
 func init() {
@@ -103,7 +101,7 @@ func supressOutput(f func()) {
 	// copy the output in a separate goroutine so printing can't block indefinitely
 	go func() {
 		var buf bytes.Buffer
-		io.Copy(&buf, r)
+		_, _ = io.Copy(&buf, r)
 		o := buf.String()
 		l.Println("[TRACE] output from OS-specific throttler:")
 		l.Println(o)

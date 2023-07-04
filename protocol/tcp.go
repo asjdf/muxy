@@ -79,19 +79,16 @@ func (p *TCPProxy) Proxy() {
 	}
 }
 
-//A proxy represents a pair of connections and their state
+// A proxy represents a pair of connections and their state
 type proxy struct {
 	middleware    []muxy.Middleware
 	sentBytes     uint64
 	receivedBytes uint64
 	laddr, raddr  *net.TCPAddr
 	lconn, rconn  *net.TCPConn
-	protocol      string
 	erred         bool
 	errsig        chan bool
 	prefix        string
-	matcher       func([]byte)
-	replacer      func([]byte) []byte
 	nagles        bool
 	hex           bool
 	packetsize    int
@@ -126,8 +123,8 @@ func (p *proxy) start() {
 
 	// nagles?
 	if p.nagles {
-		p.lconn.SetNoDelay(true)
-		p.rconn.SetNoDelay(true)
+		_ = p.lconn.SetNoDelay(true)
+		_ = p.rconn.SetNoDelay(true)
 	}
 
 	// display both ends

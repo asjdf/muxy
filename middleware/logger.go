@@ -61,7 +61,7 @@ func (l *LoggerMiddleware) HandleEvent(e muxy.ProxyEvent, ctx *muxy.Context) {
 			}
 		} else {
 			log.Info("Handle HTTP event " + log.Colorize(log.GREY, "POST_DISPATCH") + " Returning " +
-				log.Colorize(log.GREY, fmt.Sprintf("%s", ctx.Response.Status)))
+				log.Colorize(log.GREY, ctx.Response.Status))
 		}
 	}
 }

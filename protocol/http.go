@@ -9,8 +9,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"regexp"
@@ -139,7 +139,7 @@ func (p *HTTPProxy) Proxy() {
 		}
 
 		// Load CA cert
-		caCert, err := ioutil.ReadFile(p.ProxyClientSslCa)
+		caCert, err := os.ReadFile(p.ProxyClientSslCa)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -149,7 +149,6 @@ func (p *HTTPProxy) Proxy() {
 		// Setup HTTPS client
 		config.Certificates = []tls.Certificate{cert}
 		config.RootCAs = caCertPool
-		config.BuildNameToCertificate()
 	}
 
 	mux := http.NewServeMux()
@@ -161,13 +160,13 @@ func (p *HTTPProxy) Proxy() {
 
 			if MatchRule(rule, *r) {
 				log.Trace("Matched ProxyRule %v", rule)
-				director := func(req *http.Request) {
-					req = r
-
-					p.ApplyProxyPassRule(rule, req)
+				genDirector := func(req *http.Request) func(*http.Request) {
+					return func(_ *http.Request) {
+						p.ApplyProxyPassRule(rule, req)
+					}
 				}
 
-				proxy = &ReverseProxy{Director: director, Middleware: p.middleware}
+				proxy = &ReverseProxy{Director: genDirector(r), Middleware: p.middleware}
 				proxy.Transport = &http.Transport{
 					Proxy:               http.ProxyFromEnvironment,
 					TLSClientConfig:     config,
