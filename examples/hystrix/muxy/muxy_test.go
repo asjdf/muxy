@@ -11,6 +11,10 @@ import (
 )
 
 func Test_Example100calls(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	fmt.Println("Waiting for Muxy..")
 
 	select {
@@ -34,13 +38,14 @@ func Test_Example100calls(t *testing.T) {
 			if resp != nil {
 				fmt.Println("\nResponse:")
 				r := bufio.NewReader(resp.Body)
-				r.WriteTo(os.Stdout)
+				_, _ = r.WriteTo(os.Stdout)
 				fmt.Println()
 			} else {
 				fmt.Println("No response body")
 			}
 			if resp.StatusCode != 200 {
-				t.Fatalf("Expected 200 response code, but got %d", resp.StatusCode)
+				t.Errorf("Expected 200 response code, but got %d", resp.StatusCode)
+				return
 			}
 		}()
 	}
