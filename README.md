@@ -62,7 +62,7 @@ and put it somewhere on the `PATH`.
 If you are using [Homebrew](http://brew.sh) you can follow these steps to install Muxy:
 
 ```bash
-brew install https://raw.githubusercontent.com/asjdf/muxy/master/Formula/muxy.rb
+brew install asjdf/muxy/muxy
 ```
 
 ### Using Go Get
