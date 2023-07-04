@@ -72,14 +72,13 @@ func (p *UDPProxy) Proxy() {
 	proxy.start()
 }
 
-//A udpProxy represents connections and their state
+// A udpProxy represents connections and their state
 type udpProxy struct {
 	middleware    []muxy.Middleware
 	sentBytes     uint64
 	receivedBytes uint64
 	laddr, raddr  *net.UDPAddr
 	lconn         *net.UDPConn
-	protocol      string
 	erred         bool
 	prefix        string
 	hex           bool
@@ -92,7 +91,7 @@ func (p *udpProxy) start() {
 	log.Trace("UDP Proxy Starting UDP Proxy")
 
 	p.listen()
-	p.lconn.Close()
+	_ = p.lconn.Close()
 
 	log.Info("UDP Proxy closed (%d bytes sent, %d bytes received)", p.sentBytes, p.receivedBytes)
 }
@@ -104,9 +103,6 @@ type connection struct {
 }
 
 type connectionMap map[string]*connection
-
-// Mutex used to serialize access to the dictionary
-var connectionLocker *sync.Mutex = new(sync.Mutex)
 
 // Handle errors
 func handleConnectionErr(err error) bool {
