@@ -21,7 +21,9 @@ func setupLocalTCP(port int) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer l.Close()
+		defer func(l net.Listener) {
+			_ = l.Close()
+		}(l)
 
 		for {
 			// Wait for a connection.
@@ -165,7 +167,7 @@ func TestTCPProxy_ProxyWithMiddleware(t *testing.T) {
 func TestTCPProxy_ProxyFail(t *testing.T) {
 	oldCheck := check
 	doneChan := make(chan bool, 1)
-	check = func(error) {
+	check = func(string, error) {
 		doneChan <- true
 	}
 	defer func() {
