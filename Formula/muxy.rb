@@ -5,12 +5,12 @@
 class Muxy < Formula
   desc "Proxy for simulating real-world distributed system failures to improve resilience in your applications."
   homepage "https://github.com/asjdf/muxy"
-  version "1.0.0"
+  version "1.0.1"
   license "MIT"
 
   on_macos do
-    url "https://github.com/asjdf/muxy/releases/download/v1.0.0/muxy_Darwin_all.tar.gz", using: CurlDownloadStrategy
-    sha256 "530407935d6a86de5273e78420f289c645b3186941865a120cc8de1d7a8c5bbe"
+    url "https://github.com/asjdf/muxy/releases/download/v1.0.1/muxy_Darwin_all.tar.gz", using: CurlDownloadStrategy
+    sha256 "e07379a20002adda0003be537761a0fe29f4816410efbedb58973ef88c04bbaa"
 
     def install
       bin.install "muxy"
@@ -19,16 +19,16 @@ class Muxy < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/asjdf/muxy/releases/download/v1.0.0/muxy_Linux_arm64.tar.gz", using: CurlDownloadStrategy
-      sha256 "c027a7fe980fbd92919aa182105e3a82a27a7f7cb40dbae62fb1e1203da47245"
+      url "https://github.com/asjdf/muxy/releases/download/v1.0.1/muxy_Linux_arm64.tar.gz", using: CurlDownloadStrategy
+      sha256 "dd232bcbb10e729e8917aaee6ded8b35a3c55ace24a35a9c3bee16acabddecda"
 
       def install
         bin.install "muxy"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/asjdf/muxy/releases/download/v1.0.0/muxy_Linux_x86_64.tar.gz", using: CurlDownloadStrategy
-      sha256 "def25a8c13900bfa96afd46c0ee7a73830f38be4e84d8ab948a6e8d0183a9824"
+      url "https://github.com/asjdf/muxy/releases/download/v1.0.1/muxy_Linux_x86_64.tar.gz", using: CurlDownloadStrategy
+      sha256 "7c495de5119656d324d598964eaf5c5c5b00b77d9c0552523d1b30f4b5b6e006"
 
       def install
         bin.install "muxy"
