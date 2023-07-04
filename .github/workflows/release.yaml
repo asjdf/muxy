@@ -64,4 +64,5 @@ jobs:
         with:
           args: release --clean
         env:
+          PERSONAL_AUTH_TOKEN: ${{ secrets.PERSONAL_AUTH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

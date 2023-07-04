@@ -93,9 +93,11 @@ brews:
       # Repository owner.
       #
       # Templates: allowed
-      owner: asjdf
+      owner: "asjdf"
 
       # Repository name.
       #
       # Templates: allowed
-      name: muxy
+      name: "homebrew-muxy"
+
+      token: "{{ .Env.PERSONAL_AUTH_TOKEN }}"
