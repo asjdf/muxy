@@ -54,7 +54,7 @@ If you are building a distributed system, Muxy can help you test your resilience
 
 ## Installation
 
-Download a [release](https://github.com/mefellows/muxy/releases) for your platform
+Download a [release](https://github.com/asjdf/muxy/releases) for your platform
 and put it somewhere on the `PATH`.
 
 ### On Mac OSX using Homebrew
